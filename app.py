@@ -1,15 +1,15 @@
 from flask import Flask, render_template, redirect, request, url_for
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Message
 from config import Config
-from flask_socketio import join_room, leave_room, emit
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db.init_app(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='eventlet')  # render-friendly
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -20,11 +20,9 @@ def load_user(user_id):
 
 
 def get_chat_partners(user_id):
-    # Получаем всех пользователей, с которыми есть переписка
     sent = db.session.query(Message.recipient_id).filter(Message.sender_id == user_id)
     received = db.session.query(Message.sender_id).filter(Message.recipient_id == user_id)
     user_ids = sent.union(received).distinct().all()
-    # user_ids - список кортежей [(id,), (id,), ...]
     ids = [uid[0] for uid in user_ids]
     return User.query.filter(User.id.in_(ids)).all()
 
@@ -38,62 +36,29 @@ def on_join(data):
 
 @socketio.on('send_message')
 def handle_send_message(data):
-    content = data['message']
-    recipient_id = data['recipient_id']
-    sender_id = current_user.id
+    content = data.get('message')
+    recipient_id = data.get('recipient_id')
+    if not content or not recipient_id:
+        return
 
-    # Сохраняем в БД
+    sender_id = current_user.id
     msg = Message(sender_id=sender_id, recipient_id=recipient_id, body=content)
     db.session.add(msg)
     db.session.commit()
 
-    # Отправляем сообщение получателю в его комнату
+    # Отправка получателю
     room = f"user_{recipient_id}"
     emit('receive_message', {
         'username': current_user.username,
         'message': content
     }, to=room)
 
-    # И отправителю (чтобы обновить чат сразу у отправителя)
+    # И отправителю
     sender_room = f"user_{sender_id}"
     emit('receive_message', {
         'username': current_user.username,
         'message': content
     }, to=sender_room)
-
-
-@app.route('/chat')
-@login_required
-def chat():
-    chat_partners = get_chat_partners(current_user.id)
-    return render_template('chat_list.html', chat_partners=chat_partners)
-
-
-@app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
-@login_required
-def chat_with_user(user_id):
-    other_user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        msg_body = request.form.get('message')
-        if msg_body:
-            msg = Message(sender_id=current_user.id, recipient_id=other_user.id, body=msg_body)
-            db.session.add(msg)
-            db.session.commit()
-            return redirect(url_for('chat_with_user', user_id=user_id))
-
-    messages = Message.query.filter(
-        ((Message.sender_id == current_user.id) & (Message.recipient_id == user_id)) |
-        ((Message.sender_id == user_id) & (Message.recipient_id == current_user.id))
-    ).order_by(Message.timestamp.asc()).all()
-
-    return render_template('chat.html', other_user=other_user, messages=messages)
-
-
-@app.route('/users')
-@login_required
-def users_list():
-    users = User.query.filter(User.id != current_user.id).all()
-    return render_template('users.html', users=users)
 
 
 @app.route('/')
@@ -130,21 +95,38 @@ def logout():
     return redirect(url_for('login'))
 
 
-@socketio.on('send_message')
-def handle_send_message(data):
-    content = data['message']
-    recipient_id = data.get('recipient_id')
-    if not recipient_id:
-        return
+@app.route('/chat')
+@login_required
+def chat():
+    chat_partners = get_chat_partners(current_user.id)
+    return render_template('chat_list.html', chat_partners=chat_partners)
 
-    msg = Message(sender_id=current_user.id, recipient_id=int(recipient_id), body=content)
-    db.session.add(msg)
-    db.session.commit()
-    emit('receive_message', {
-        'username': current_user.username,
-        'message': content,
-        'recipient_id': recipient_id
-    }, broadcast=True)
+
+@app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def chat_with_user(user_id):
+    other_user = User.query.get_or_404(user_id)
+    if request.method == 'POST':
+        msg_body = request.form.get('message')
+        if msg_body:
+            msg = Message(sender_id=current_user.id, recipient_id=other_user.id, body=msg_body)
+            db.session.add(msg)
+            db.session.commit()
+            return redirect(url_for('chat_with_user', user_id=user_id))
+
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.recipient_id == user_id)) |
+        ((Message.sender_id == user_id) & (Message.recipient_id == current_user.id))
+    ).order_by(Message.timestamp.asc()).all()
+
+    return render_template('chat.html', other_user=other_user, messages=messages)
+
+
+@app.route('/users')
+@login_required
+def users_list():
+    users = User.query.filter(User.id != current_user.id).all()
+    return render_template('users.html', users=users)
 
 
 if __name__ == '__main__':
