@@ -8,14 +8,22 @@
 <body>
     <h1>Chat with {{ other_user.username }}</h1>
 
-    <div id="messages" style="height: 400px; overflow-y: auto;" class="chat">
-      {% for msg in messages %}
-        <p><strong>{{ msg.sender.username }}:</strong>
-            {{ msg.body }}
-            <span class="timestamp">{{ message.timestamp.strftime('%d.%m.%Y %H:%M') }}</span>
-        </p>
-      {% endfor %}
+<div id="messages" style="height: 400px; overflow-y: auto;" class="chat">
+  {% for msg in messages %}
+    <div class="{% if msg.sender.id == current_user.id %}my-message{% else %}other-message{% endif %}">
+      <p>
+        <strong>
+          {% if msg.sender.id == current_user.id %}
+            Me:
+          {% else %}
+            {{ msg.sender.username }}:
+          {% endif %}
+        </strong>
+        {{ msg.body }}
+      </p>
     </div>
+  {% endfor %}
+</div>
 
     <form method="post">
         <textarea name="message" rows="3" cols="40" required></textarea><br />

@@ -50,16 +50,14 @@ def handle_send_message(data):
     room = f"user_{recipient_id}"
     emit('receive_message', {
         'username': current_user.username,
-        'message': content,
-        'timestamp': msg.timestamp.strftime('%H:%M')
+        'message': content
     }, to=room)
 
     # И отправителю
     sender_room = f"user_{sender_id}"
     emit('receive_message', {
         'username': current_user.username,
-        'message': content,
-        'timestamp': msg.timestamp.strftime('%H:%M')
+        'message': content
     }, to=sender_room)
 
 
