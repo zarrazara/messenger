@@ -38,6 +38,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
 <script>
+    const currentUserId = {{ current_user.id }};
     const socket = io();
 
     // При подключении отправляем серверу, кто мы (чтобы присоединиться к своей комнате)
@@ -50,21 +51,26 @@
         const message = input.value.trim();
         if (!message) return;
 
-        socket.emit('send_message', {
-            message: message,
-            recipient_id: {{ other_user.id }}
-        });
+        socketio.emit('receive_message', {
+            'message': message.body,
+            'username': current_user.username,
+            'user_id': current_user.id,  # <--- вот это обязательно
+            'recipient_id': recipient.id
+        }, room=recipient_room)
 
         input.value = '';
     });
 
     // Получение сообщения
     socket.on('receive_message', function(data) {
-        const chatDiv = document.getElementById('messages'); // контейнер с сообщениями
+        const chatDiv = document.getElementById('messages');
         const p = document.createElement('p');
-        p.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+
+        const senderName = (data.user_id === currentUserId) ? 'Me' : data.username;
+
+        p.innerHTML = `<strong>${senderName}:</strong> ${data.message}`;
         chatDiv.appendChild(p);
-        chatDiv.scrollTop = chatDiv.scrollHeight; // автопрокрутка вниз
+        chatDiv.scrollTop = chatDiv.scrollHeight;
     });
 </script>
 
