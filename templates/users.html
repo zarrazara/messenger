@@ -2,10 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Все пользователи</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <title>All users</title>
 </head>
 <body>
-    <h1>Все пользователи</h1>
+    <h1>All users</h1>
 
     {% if users %}
         <ul>
@@ -14,10 +15,10 @@
         {% endfor %}
         </ul>
     {% else %}
-        <p>Пользователей нет.</p>
+        <p>There are no users.</p>
     {% endif %}
 
-    <p><a href="{{ url_for('chat') }}">Назад к моим чатам</a></p>
-    <p><a href="{{ url_for('logout') }}">Выйти</a></p>
+    <p><a href="{{ url_for('chat') }}">Back to chat rooms</a></p>
+    <p><a href="{{ url_for('logout') }}">Log out</a></p>
 </body>
 </html>
