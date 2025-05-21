@@ -103,17 +103,10 @@ def chat():
     return render_template('chat_list.html', chat_partners=chat_partners)
 
 
-@app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/chat/<int:user_id>', methods=['GET'])
 @login_required
 def chat_with_user(user_id):
     other_user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        msg_body = request.form.get('message')
-        if msg_body:
-            msg = Message(sender_id=current_user.id, recipient_id=other_user.id, body=msg_body)
-            db.session.add(msg)
-            db.session.commit()
-            return redirect(url_for('chat_with_user', user_id=user_id))
 
     messages = Message.query.filter(
         ((Message.sender_id == current_user.id) & (Message.recipient_id == user_id)) |
