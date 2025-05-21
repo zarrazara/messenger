@@ -46,19 +46,20 @@ def handle_send_message(data):
     db.session.add(msg)
     db.session.commit()
 
-    # Отправка получателю
-    room = f"user_{recipient_id}"
-    emit('receive_message', {
+    payload = {
         'username': current_user.username,
+        'user_id': sender_id,
         'message': content
-    }, to=room)
+    }
 
-    # И отправителю
+    # Отправка получателю
+    recipient_room = f"user_{recipient_id}"
+    emit('receive_message', payload, room=recipient_room)
+
+    # Отправка отправителю
     sender_room = f"user_{sender_id}"
-    emit('receive_message', {
-        'username': current_user.username,
-        'message': content
-    }, to=sender_room)
+    emit('receive_message', payload, room=sender_room)
+
 
 
 @app.route('/')

@@ -51,15 +51,22 @@
         const message = input.value.trim();
         if (!message) return;
 
-        socketio.emit('receive_message', {
-            'message': message.body,
-            'username': current_user.username,
-            'user_id': current_user.id,  # <--- вот это обязательно
-            'recipient_id': recipient.id
-        }, room=recipient_room)
+        // Отобразим сообщение сразу (опционально)
+        const chatDiv = document.getElementById('messages');
+        const p = document.createElement('p');
+        p.innerHTML = `<strong>Me:</strong> ${message}`;
+        chatDiv.appendChild(p);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
 
-        input.value = '';
-    });
+        // Отправим сообщение на сервер
+        socket.emit('send_message', {
+            message: message,
+            recipient_id: {{ other_user.id }}
+        });
+
+    input.value = '';
+});
+
 
     // Получение сообщения
     socket.on('receive_message', function(data) {
