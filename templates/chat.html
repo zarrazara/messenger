@@ -50,22 +50,16 @@
         const input = this.querySelector('textarea[name="message"]');
         const message = input.value.trim();
         if (!message) return;
-
-        // Отобразим сообщение сразу (опционально)
-        const chatDiv = document.getElementById('messages');
-        const p = document.createElement('p');
-        p.innerHTML = `<strong>Me:</strong> ${message}`;
-        chatDiv.appendChild(p);
-        chatDiv.scrollTop = chatDiv.scrollHeight;
-
+    
         // Отправим сообщение на сервер
         socket.emit('send_message', {
             message: message,
             recipient_id: {{ other_user.id }}
         });
+    
+        input.value = '';
+    });
 
-    input.value = '';
-});
 
 
     // Получение сообщения
