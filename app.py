@@ -95,6 +95,41 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@socketio.on('call_user')
+def call_user(data):
+    recipient_id = data['to']
+    room = f"user_{recipient_id}"
+    emit('receive_call', {
+        'offer': data['offer'],
+        'from': current_user.id
+    }, room=room)
+
+
+
+
+
+@socketio.on('answer_call')
+def answer_call(data):
+    recipient_id = data['to']
+    room = f"user_{recipient_id}"
+    emit('call_answered', {
+        'answer': data['answer']
+    }, room=room)
+
+
+@socketio.on('ice_candidate')
+def handle_ice_candidate(data):
+    recipient_id = data['to']
+    room = f"user_{recipient_id}"
+    emit('ice_candidate', {
+        'candidate': data['candidate']
+    }, room=room)
+
+
+
+
+
+
 
 @app.route('/chat')
 @login_required
