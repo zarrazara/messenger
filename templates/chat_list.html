@@ -2,11 +2,81 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
+    <title>Чаты</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    <title>Chats</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f2f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        li {
+            background-color: #fff;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        li:hover {
+            transform: scale(1.02);
+        }
+
+        a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #0077cc;
+            font-weight: 500;
+        }
+
+        a:hover {
+            background-color: #f0f8ff;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 15px;
+            background-color: #0077cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .links a:hover {
+            background-color: #005fa3;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat rooms</h1>
+    <h1>Мои чаты - Milana </h1>
 
     {% if chat_partners %}
         <ul>
@@ -17,10 +87,12 @@
         {% endfor %}
         </ul>
     {% else %}
-        <p>You don't have any chat rooms.</p>
+        <p>У вас пока нет активных чатов.</p>
     {% endif %}
 
-    <p><a href="{{ url_for('users_list') }}">All users</a></p>
-    <p><a href="{{ url_for('logout') }}">Log out</a></p>
+    <div class="links">
+        <a href="{{ url_for('users_list') }}">Все пользователи</a>
+        <a href="{{ url_for('logout') }}">Выйти</a>
+    </div>
 </body>
 </html>
