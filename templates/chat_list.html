@@ -5,78 +5,134 @@
     <title>Чаты</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --shadow-light: rgba(59, 130, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f2f4f8;
-            margin: 0;
-            padding: 20px;
-            color: #333;
+            background-color: var(--bg-light);
+            padding: 30px 15px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 {
-            text-align: center;
+            font-size: 2.4rem;
             margin-bottom: 30px;
+            color: var(--primary);
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         ul {
             list-style: none;
             padding: 0;
             max-width: 500px;
-            margin: 0 auto 20px;
+            width: 100%;
         }
 
         li {
-            background-color: #fff;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px var(--shadow-light);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
         li:hover {
-            transform: scale(1.02);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow-light);
         }
 
         a {
             display: block;
-            padding: 15px 20px;
+            padding: 18px 25px;
             text-decoration: none;
-            color: #0077cc;
-            font-weight: 500;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.15rem;
+            border-radius: 16px;
+            transition: background-color 0.2s ease;
+            user-select: none;
         }
 
         a:hover {
-            background-color: #f0f8ff;
+            background-color: #dbeafe;
+            color: var(--primary-hover);
         }
 
         .links {
-            text-align: center;
             margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 500px;
         }
 
         .links a {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 10px 15px;
-            background-color: #0077cc;
-            color: white;
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: var(--bg-white);
             text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+            user-select: none;
         }
 
         .links a:hover {
-            background-color: #005fa3;
+            background-color: var(--primary-hover);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5);
+            transform: scale(1.05);
         }
 
         p {
             text-align: center;
-            color: #666;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .links {
+                gap: 15px;
+            }
+
+            .links a {
+                flex: 1 1 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Мои чаты - Milana </h1>
+    <h1>Мои чаты</h1>
 
     {% if chat_partners %}
         <ul>
