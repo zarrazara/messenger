@@ -2,23 +2,88 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
+    <title>Пользователи</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    <title>All users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a.user-link {
+            display: block;
+            padding: 10px 15px;
+            background-color: #e6f0fa;
+            color: #2a5d9f;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        a.user-link:hover {
+            background-color: #d0e6fc;
+        }
+
+        .footer-links {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-links a {
+            color: #555;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>All users</h1>
+    <div class="container">
+        <h1>Все пользователи</h1>
 
-    {% if users %}
-        <ul>
-        {% for user in users %}
-            <li><a href="{{ url_for('chat_with_user', user_id=user.id) }}">{{ user.username }}</a></li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no users.</p>
-    {% endif %}
+        {% if users %}
+            <ul>
+            {% for user in users %}
+                <li><a class="user-link" href="{{ url_for('chat_with_user', user_id=user.id) }}">{{ user.username }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>Пользователей пока нет.</p>
+        {% endif %}
 
-    <p><a href="{{ url_for('chat') }}">Back to chat rooms</a></p>
-    <p><a href="{{ url_for('logout') }}">Log out</a></p>
+        <div class="footer-links">
+            <a href="{{ url_for('chat') }}">← Назад к чатам</a>
+            <a href="{{ url_for('logout') }}">Выйти</a>
+        </div>
+    </div>
 </body>
 </html>
